@@ -1,24 +1,24 @@
-import { requestUrl } from "obsidian";
+import { requestUrl } from 'obsidian'
 
 export class JotterJoyApi {
 	async fetchTags(url: string, text: string): Promise<Array<string>> {
-		const urlObject = new URL("/documents/tags", url);
-		urlObject.search = new URLSearchParams({ text }).toString();
+		const urlObject = new URL('/documents/tags', url)
+		urlObject.search = new URLSearchParams({ text }).toString()
 
 		const response = await requestUrl({
 			url: urlObject.toString(),
-			method: "POST",
+			method: 'POST',
 			headers: {
-				"Content-Type": "application/json",
-				Accept: "application/json",
-			},
-		});
+				'Content-Type': 'application/json',
+				Accept: 'application/json'
+			}
+		})
 
 		if (response.status >= 400) {
-			throw new Error(`API call error: ${response.status}`);
+			throw new Error(`API call error: ${response.status}`)
 		}
 
-		const data = JSON.parse(response.text);
-		return data.tags;
+		const data = JSON.parse(response.text)
+		return data.tags
 	}
 }
