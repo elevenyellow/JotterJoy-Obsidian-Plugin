@@ -40,11 +40,8 @@ export default class JotterJoyPlugin extends Plugin {
 					console.error(_err)
 					loadingNotice.hide()
 				}
-				console.log(tags)
 
-				tags.forEach((tag) => {
-					this.viewManager.insertAtContentTop(tag, OutType.Tag)
-				})
+				this.viewManager.insertAtContentTop(tags, OutType.Tag)
 			}
 		})
 	}

@@ -4,6 +4,7 @@ export enum OutType {
 	FrontMatter,
 	Title,
 	Tag,
+	Tags,
 	Wikilink
 }
 
@@ -151,13 +152,18 @@ export class ViewManager {
 	}
 
 	async insertAtContentTop(
-		value: string,
+		value: string | string[],
 		outType: OutType,
 		prefix = '',
 		suffix = ''
 	): Promise<void> {
 		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
-		const output = this.preprocessOutput(value, outType, prefix, suffix)
+		const output = Array.isArray(value)
+			? value
+					.map((t) => this.preprocessOutput(t, outType, prefix, suffix))
+					.join('')
+			: this.preprocessOutput(value, outType, prefix, suffix)
+		console.log({ output })
 
 		if (activeView && activeView.file) {
 			const editor = activeView.editor
@@ -186,7 +192,7 @@ export class ViewManager {
 		if (outType == OutType.Tag) {
 			output = `${prefix}${value}${suffix}`
 			output = output.replace(/ /g, '_')
-			output = ` #${output} `
+			output = `#${output} `
 		} else if (outType == OutType.Wikilink)
 			output = `[[${prefix}${value}${suffix}]]`
 		return output
