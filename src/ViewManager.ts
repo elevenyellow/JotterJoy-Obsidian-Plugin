@@ -35,17 +35,14 @@ export class ViewManager {
 	}
 
 	async getFrontMatter(): Promise<string | null> {
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
-		if (activeView) {
-			const file = activeView.file
-			const frontmatter = this.app.metadataCache.getFileCache(file)
-				?.frontmatter as Partial<FrontMatterCache>
-			if (frontmatter?.position) {
-				delete frontmatter.position
-			}
-			return JSON.stringify(frontmatter)
+		const activeView = this.getActiveMarkdownView()
+		const file = activeView.file
+		const frontmatter = this.app.metadataCache.getFileCache(file)
+			?.frontmatter as Partial<FrontMatterCache>
+		if (frontmatter?.position) {
+			delete frontmatter.position
 		}
-		return null
+		return JSON.stringify(frontmatter)
 	}
 
 	async getContent(): Promise<string | null> {
@@ -62,18 +59,18 @@ export class ViewManager {
 		return content
 	}
 
-	async getTags(filterRegex?: string): Promise<string[] | null> {
-		const tagsDict = this.app.metadataCache.getTags()
-		let tags = Object.keys(tagsDict)
-		if (!tags || tags.length == 0) return null
-		// remove #
-		tags = tags.map((tag) => tag.replace(/^#/, ''))
-		// filter
-		if (filterRegex) {
-			return tags.filter((tag) => RegExp(filterRegex).test(tag))
-		}
-		return tags
-	}
+	// async getTags(filterRegex?: string): Promise<string[] | null> {
+	// 	const tagsDict = this.app.metadataCache.getTags()
+	// 	let tags = Object.keys(tagsDict)
+	// 	if (!tags || tags.length == 0) return null
+	// 	// remove #
+	// 	tags = tags.map((tag) => tag.replace(/^#/, ''))
+	// 	// filter
+	// 	if (filterRegex) {
+	// 		return tags.filter((tag) => RegExp(filterRegex).test(tag))
+	// 	}
+	// 	return tags
+	// }
 
 	async insertAtFrontMatter(
 		key: string,
