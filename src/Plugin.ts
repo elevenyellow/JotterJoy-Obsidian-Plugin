@@ -29,7 +29,7 @@ export default class JotterJoyPlugin extends Plugin {
 				}
 
 				const loadingNotice = this.createLoadingNotice(
-					`${this.manifest.name}: Processing..`
+					`${this.manifest.name}: Coming up with some tags ...`
 				)
 
 				let tags: Array<string> = []
@@ -56,7 +56,7 @@ export default class JotterJoyPlugin extends Plugin {
 				}
 
 				const loadingNotice = this.createLoadingNotice(
-					`${this.manifest.name}: Processing..`
+					`${this.manifest.name}: Coming up with some tags ...`
 				)
 
 				let tags: Array<string> = []
