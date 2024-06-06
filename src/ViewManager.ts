@@ -1,4 +1,4 @@
-import { App, MarkdownView, Editor, FrontMatterCache } from 'obsidian'
+import { App, MarkdownView, Editor, FrontMatterCache, TFile } from 'obsidian'
 
 export enum OutType {
 	FrontMatter,
@@ -49,23 +49,20 @@ export class ViewManager {
 	}
 
 	async getContent(): Promise<string | null> {
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
-		if (activeView && activeView.file) {
-			// delete frontmatter
-			let content = activeView.getViewData()
-			const file = activeView.file
-			const frontmatter: FrontMatterCache | undefined =
-				this.app.metadataCache.getFileCache(file)?.frontmatter
-			if (frontmatter) {
-				content = content.split('---').slice(2).join('---')
-			}
-			return content
+		const activeView = this.getActiveMarkdownView()
+
+		// delete frontmatter
+		let content = activeView.getViewData()
+		const file = activeView.file
+		const frontmatter: FrontMatterCache | undefined =
+			this.app.metadataCache.getFileCache(file)?.frontmatter
+		if (frontmatter) {
+			content = content.split('---').slice(2).join('---')
 		}
-		return null
+		return content
 	}
 
 	async getTags(filterRegex?: string): Promise<string[] | null> {
-		//@ts-ignore
 		const tagsDict = this.app.metadataCache.getTags()
 		let tags = Object.keys(tagsDict)
 		if (!tags || tags.length == 0) return null
@@ -86,26 +83,24 @@ export class ViewManager {
 		suffix = ''
 	): Promise<void> {
 		value = `${prefix}${value}${suffix}`
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+		const activeView = this.getActiveMarkdownView()
 
-		if (activeView && activeView.file) {
-			const file = activeView.file
-			await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
-				frontmatter = frontmatter || {}
+		const file = activeView.file
+		await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+			frontmatter = frontmatter || {}
 
-				if (frontmatter[key] && !overwrite) {
-					// add value as list element if exist
-					if (Array.isArray(frontmatter[key])) {
-						frontmatter[key].push(value)
-					} else {
-						frontmatter[key] = [frontmatter[key], value]
-					}
+			if (frontmatter[key] && !overwrite) {
+				// add value as list element if exist
+				if (Array.isArray(frontmatter[key])) {
+					frontmatter[key].push(value)
 				} else {
-					// overwrite
-					frontmatter[key] = value
+					frontmatter[key] = [frontmatter[key], value]
 				}
-			})
-		}
+			} else {
+				// overwrite
+				frontmatter[key] = value
+			}
+		})
 	}
 
 	async insertAtTitle(
@@ -136,19 +131,17 @@ export class ViewManager {
 		prefix = '',
 		suffix = ''
 	): Promise<void> {
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+		const activeView = this.getActiveMarkdownView()
 		const output = this.preprocessOutput(value, outType, prefix, suffix)
 
-		if (activeView) {
-			const editor = activeView.editor
-			const selection = editor.getSelection()
-			if (selection && !overwrite) {
-				// replace selection
-				editor.setSelection(editor.getCursor('to'))
-			}
-			// overwrite
-			editor.replaceSelection(output)
+		const editor = activeView.editor
+		const selection = editor.getSelection()
+		if (selection && !overwrite) {
+			// replace selection
+			editor.setSelection(editor.getCursor('to'))
 		}
+		// overwrite
+		editor.replaceSelection(output)
 	}
 
 	async insertAtContentTop(
@@ -157,29 +150,35 @@ export class ViewManager {
 		prefix = '',
 		suffix = ''
 	): Promise<void> {
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+		const activeView = this.getActiveMarkdownView()
 		const output = Array.isArray(value)
 			? value
 					.map((t) => this.preprocessOutput(t, outType, prefix, suffix))
 					.join('')
 			: this.preprocessOutput(value, outType, prefix, suffix)
-		console.log({ output })
 
-		if (activeView && activeView.file) {
-			const editor = activeView.editor
-			const file = activeView.file
-			const sections = this.app.metadataCache.getFileCache(file)?.sections
+		const editor = activeView.editor
+		const file = activeView.file
+		const sections = this.app.metadataCache.getFileCache(file)?.sections
 
-			// get the line after frontmatter
-			let topLine = 0
-			if (sections && sections[0].type == 'yaml') {
-				topLine = sections[0].position.end.line + 1
-			}
-
-			// replace top of the content
-			editor.setCursor({ line: topLine, ch: 0 })
-			editor.replaceSelection(`${output}\n`)
+		// get the line after frontmatter
+		let topLine = 0
+		if (sections && sections[0].type == 'yaml') {
+			topLine = sections[0].position.end.line + 1
 		}
+
+		// replace top of the content
+		editor.setCursor({ line: topLine, ch: 0 })
+		editor.replaceSelection(`${output}\n`)
+	}
+
+	getActiveMarkdownView() {
+		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+		if (activeView && activeView.file) {
+			return activeView as Omit<MarkdownView, 'file'> & { get file(): TFile }
+		}
+
+		throw new Error('No active file')
 	}
 
 	preprocessOutput(
