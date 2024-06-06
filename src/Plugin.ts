@@ -34,7 +34,7 @@ export default class JotterJoyPlugin extends Plugin {
 
 				let tags: Array<string> = []
 				try {
-					tags = await this.api.fetchTags(this.settings.apiUrl, noteText)
+					tags = await this.api.fetchTags(this.settings, noteText)
 					loadingNotice.hide()
 				} catch (_err) {
 					console.error(_err)

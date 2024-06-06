@@ -3,12 +3,19 @@ import type JotterJoyPlugin from './Plugin'
 
 export const DEFAULT_SETTINGS: JotterJoyPluginSettings = {
 	apiUrl: 'http://127.0.0.1:8000/',
-	frontmatterPropertyName: 'tags'
+	frontmatterPropertyName: 'tags',
+	model: 'groq:llama3-8b-8192'
+}
+
+export const JOTTER_JOY_MODELS = {
+	'groq:llama3-70b-8192': 'Groq Llama3 70 Billion',
+	'groq:llama3-8b-8192': 'Groq Llama3 8 Billion'
 }
 
 export interface JotterJoyPluginSettings {
 	apiUrl: string
 	frontmatterPropertyName: string
+	model: keyof typeof JOTTER_JOY_MODELS
 }
 
 export class JotterJoySettingsTab extends PluginSettingTab {
@@ -46,6 +53,17 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 							await this.plugin.saveSettings()
 						}
 					})
+			)
+
+		new Setting(containerEl)
+			.setName('LLM Model')
+			.setDesc('Choose the model you want suggestions from.')
+
+			.addDropdown((dropdown) =>
+				dropdown.addOptions(JOTTER_JOY_MODELS).onChange(async (value) => {
+					this.plugin.settings.model = value as keyof typeof JOTTER_JOY_MODELS
+					await this.plugin.saveSettings()
+				})
 			)
 
 		new Setting(containerEl)

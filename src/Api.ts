@@ -1,8 +1,12 @@
 import { requestUrl } from 'obsidian'
+import { JotterJoyPluginSettings } from './SettingsTab'
 
 export class JotterJoyApi {
-	async fetchTags(url: string, text: string): Promise<Array<string>> {
-		const urlObject = new URL('/documents/tags', url)
+	async fetchTags(
+		settings: JotterJoyPluginSettings,
+		text: string
+	): Promise<Array<string>> {
+		const urlObject = new URL('/documents/tags', settings.apiUrl)
 		urlObject.search = new URLSearchParams({ text }).toString()
 
 		const response = await requestUrl({
@@ -11,7 +15,10 @@ export class JotterJoyApi {
 			headers: {
 				'Content-Type': 'application/json',
 				Accept: 'application/json'
-			}
+			},
+			body: JSON.stringify({
+				model: settings.model
+			})
 		})
 
 		if (response.status >= 400) {
