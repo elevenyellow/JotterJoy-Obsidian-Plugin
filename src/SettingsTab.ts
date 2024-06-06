@@ -2,11 +2,13 @@ import { App, PluginSettingTab, Setting } from 'obsidian'
 import type JotterJoyPlugin from './Plugin'
 
 export const DEFAULT_SETTINGS: JotterJoyPluginSettings = {
-	apiUrl: 'http://127.0.0.1:8000/'
+	apiUrl: 'http://127.0.0.1:8000/',
+	frontmatterPropertyName: 'tags'
 }
 
 export interface JotterJoyPluginSettings {
 	apiUrl: string
+	frontmatterPropertyName: string
 }
 
 export class JotterJoySettingsTab extends PluginSettingTab {
@@ -27,7 +29,7 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 			.setDesc('A compatible JotterJoy API URL')
 			.addExtraButton((button) => {
 				button.setIcon('undo-2')
-				button.setTooltip('Reset to default URL')
+				button.setTooltip('Reset to default URL.')
 				button.onClick(async () => {
 					this.plugin.settings.apiUrl = DEFAULT_SETTINGS.apiUrl
 					await this.plugin.saveSettings()
@@ -41,6 +43,21 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						if (this.isUrlValid(value)) {
 							this.plugin.settings.apiUrl = value
+							await this.plugin.saveSettings()
+						}
+					})
+			)
+
+		new Setting(containerEl)
+			.setName('Frontmatter property name')
+			.setDesc('Frontmatter tags will be saved under this property.')
+			.addText((text) =>
+				text
+					.setPlaceholder('Enter a property name')
+					.setValue(this.plugin.settings.frontmatterPropertyName)
+					.onChange(async (value) => {
+						if (this.isUrlValid(value)) {
+							this.plugin.settings.frontmatterPropertyName = value
 							await this.plugin.saveSettings()
 						}
 					})
