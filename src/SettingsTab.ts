@@ -56,10 +56,8 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 					.setPlaceholder('Enter a property name')
 					.setValue(this.plugin.settings.frontmatterPropertyName)
 					.onChange(async (value) => {
-						if (this.isUrlValid(value)) {
-							this.plugin.settings.frontmatterPropertyName = value
-							await this.plugin.saveSettings()
-						}
+						this.plugin.settings.frontmatterPropertyName = value
+						await this.plugin.saveSettings()
 					})
 			)
 	}

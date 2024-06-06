@@ -17,10 +17,10 @@ export default class JotterJoyPlugin extends Plugin {
 		await this.loadSettings()
 		this.addSettingTab(new JotterJoySettingsTab(this.app, this))
 
-		// This adds a simple command that can be triggered anywhere
+		// commands
 		this.addCommand({
-			id: 'generate-tags',
-			name: 'Generate Tags',
+			id: 'generate-tags-at-beginning',
+			name: 'Generate Tags at Beginning',
 			callback: async () => {
 				const noteText = await this.viewManager.getContent()
 				if (!noteText) {
@@ -42,6 +42,38 @@ export default class JotterJoyPlugin extends Plugin {
 				}
 
 				this.viewManager.insertAtContentTop(tags, OutType.Tag)
+			}
+		})
+
+		this.addCommand({
+			id: 'generate-tags-in-frontmatter',
+			name: `Generate Tags in Frontmatter`,
+			callback: async () => {
+				const noteText = await this.viewManager.getContent()
+				if (!noteText) {
+					new Notice('No text in note')
+					return
+				}
+
+				const loadingNotice = this.createLoadingNotice(
+					`${this.manifest.name}: Processing..`
+				)
+
+				let tags: Array<string> = []
+				try {
+					tags = await this.api.fetchTags(this.settings.apiUrl, noteText)
+					loadingNotice.hide()
+				} catch (_err) {
+					console.error(_err)
+					loadingNotice.hide()
+				}
+
+				tags.forEach((tag) => {
+					this.viewManager.insertAtFrontMatter(
+						this.settings.frontmatterPropertyName,
+						tag
+					)
+				})
 			}
 		})
 	}
