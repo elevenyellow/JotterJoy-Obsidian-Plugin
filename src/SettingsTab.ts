@@ -8,8 +8,8 @@ export const DEFAULT_SETTINGS: JotterJoyPluginSettings = {
 }
 
 export const JOTTER_JOY_MODELS = {
-	'groq:llama3-70b-8192': 'Groq Llama3 70 Billion',
-	'groq:llama3-8b-8192': 'Groq Llama3 8 Billion'
+	'groq:llama3-8b-8192': 'Groq Llama3 8 Billion',
+	'groq:llama3-70b-8192': 'Groq Llama3 70 Billion'
 }
 
 export interface JotterJoyPluginSettings {
@@ -60,10 +60,13 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 			.setDesc('Choose the model you want suggestions from.')
 
 			.addDropdown((dropdown) =>
-				dropdown.addOptions(JOTTER_JOY_MODELS).onChange(async (value) => {
-					this.plugin.settings.model = value as keyof typeof JOTTER_JOY_MODELS
-					await this.plugin.saveSettings()
-				})
+				dropdown
+					.addOptions(JOTTER_JOY_MODELS)
+					.setValue(this.plugin.settings.model)
+					.onChange(async (value) => {
+						this.plugin.settings.model = value as keyof typeof JOTTER_JOY_MODELS
+						await this.plugin.saveSettings()
+					})
 			)
 
 		new Setting(containerEl)
