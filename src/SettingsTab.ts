@@ -3,6 +3,7 @@ import type JotterJoyPlugin from './Plugin'
 
 export const DEFAULT_SETTINGS: JotterJoyPluginSettings = {
 	apiUrl: 'http://127.0.0.1:8000/',
+	apiKey: '',
 	frontmatterPropertyName: 'tags',
 	model: 'groq:llama3-8b-8192'
 }
@@ -14,6 +15,7 @@ export const JOTTER_JOY_MODELS = {
 
 export interface JotterJoyPluginSettings {
 	apiUrl: string
+	apiKey: string
 	frontmatterPropertyName: string
 	model: keyof typeof JOTTER_JOY_MODELS
 }
@@ -52,6 +54,19 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 							this.plugin.settings.apiUrl = value
 							await this.plugin.saveSettings()
 						}
+					})
+			)
+
+		new Setting(containerEl)
+			.setName('API Key')
+			.setDesc('A Groq API key.')
+			.addText((text) =>
+				text
+					.setPlaceholder('Enter an API key')
+					.setValue(this.plugin.settings.apiKey)
+					.onChange(async (value) => {
+						this.plugin.settings.apiKey = value
+						await this.plugin.saveSettings()
 					})
 			)
 

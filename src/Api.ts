@@ -12,10 +12,7 @@ export class JotterJoyApi {
 		const response = await requestUrl({
 			url: urlObject.toString(),
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json'
-			},
+			headers: this.buildHeaders(settings),
 			body: JSON.stringify({
 				model: settings.model
 			})
@@ -39,10 +36,7 @@ export class JotterJoyApi {
 		const response = await requestUrl({
 			url: urlObject.toString(),
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json'
-			},
+			headers: this.buildHeaders(settings),
 			body: JSON.stringify({
 				model: settings.model
 			})
@@ -54,5 +48,20 @@ export class JotterJoyApi {
 
 		const data = JSON.parse(response.text)
 		return data.fixed_text
+	}
+
+	private buildHeaders(
+		settings: JotterJoyPluginSettings
+	): Record<string, string> {
+		const headers: Record<string, string> = {
+			'Content-Type': 'application/json',
+			Accept: 'application'
+		}
+
+		if (settings.apiKey) {
+			headers['api_key'] = settings.apiKey
+		}
+
+		return headers
 	}
 }
