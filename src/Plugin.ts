@@ -76,6 +76,40 @@ export default class JotterJoyPlugin extends Plugin {
 				})
 			}
 		})
+
+		this.addCommand({
+			id: 'proofread-note',
+			name: `Proofread Note`,
+			callback: async () => {
+				const noteText = await this.viewManager.getContent()
+				if (!noteText) {
+					new Notice('No text in note')
+					return
+				}
+
+				const loadingNotice = this.createLoadingNotice(
+					`${this.manifest.name}: Proofreading your text ...`
+				)
+
+				let fixedText: string = ''
+				try {
+					fixedText = await this.api.proofReadNote(this.settings, noteText)
+					loadingNotice.hide()
+				} catch (_err) {
+					console.error(_err)
+					loadingNotice.hide()
+				}
+
+				if (fixedText.length) {
+					try {
+						const activeFile = this.viewManager.getActiveMarkdownView()
+						await this.app.vault.modify(activeFile.file, fixedText)
+					} catch (error) {
+						console.error(`Failed to replace text`, error)
+					}
+				}
+			}
+		})
 	}
 
 	onunload() {}

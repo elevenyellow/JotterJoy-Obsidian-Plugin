@@ -33,10 +33,10 @@ export class JotterJoySettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('API URL')
-			.setDesc('A compatible JotterJoy API URL')
+			.setDesc('A compatible JotterJoy API URL.')
 			.addExtraButton((button) => {
 				button.setIcon('undo-2')
-				button.setTooltip('Reset to default URL.')
+				button.setTooltip('Reset to default URL')
 				button.onClick(async () => {
 					this.plugin.settings.apiUrl = DEFAULT_SETTINGS.apiUrl
 					await this.plugin.saveSettings()
