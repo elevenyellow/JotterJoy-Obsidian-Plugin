@@ -1,6 +1,6 @@
 {
 	"name": "jotter-joy-plugin",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A plugin for Obsidian that helps improving notes with automated tagging using a LLM running locally.",
 	"main": "main.js",
 	"scripts": {
