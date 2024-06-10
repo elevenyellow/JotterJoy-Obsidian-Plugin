@@ -67,7 +67,7 @@ Currently only available in MacOS devices with M1 chips or higher. Not available
 
 ### Step 5: Download and Run the Server
 
-1. Go (JotterJoy)[https://github.com/elevenyellow/JotterJoy] repository on GitHub.
+1. Go [JotterJoy](https://github.com/elevenyellow/JotterJoy) repository on GitHub.
 
 2. Download the server ```.zip``` file from the releases section.
 
